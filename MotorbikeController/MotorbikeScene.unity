@@ -5317,10 +5317,9 @@ GameObject:
   - component: {fileID: 3410583423167332457}
   - component: {fileID: 8371560946562905823}
   - component: {fileID: 6936262923518141325}
-  - component: {fileID: 8371560946562905824}
   m_Layer: 0
   m_Name: BACKWHEEL
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6688,30 +6687,13 @@ GameObject:
   - component: {fileID: 241186955793319704}
   - component: {fileID: 4446317513252287962}
   - component: {fileID: 7194637953835316781}
-  - component: {fileID: 7544603933461340759}
   m_Layer: 0
   m_Name: FRONTWHEEL
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &7544603933461340759
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7544603933461340758}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 630e907d33222ba4abbaa3383aac6d37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shader: {fileID: 7200000, guid: f3bc2717bc41b114dbacf767f69f1131, type: 3}
-  texture: {fileID: 0}
-  tag: Player
-  spotSize: 2
 --- !u!23 &7561477711680224368
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7188,22 +7170,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5590934614476284731}
   m_Mesh: {fileID: -4990829700342139071, guid: 657aabf8db4249747bf5e43da38367a4, type: 3}
---- !u!114 &8371560946562905824
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5590934614476284731}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 630e907d33222ba4abbaa3383aac6d37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shader: {fileID: 7200000, guid: f3bc2717bc41b114dbacf767f69f1131, type: 3}
-  texture: {fileID: 0}
-  tag: Player
-  spotSize: 2
 --- !u!4 &8374247606110171142
 Transform:
   m_ObjectHideFlags: 0
