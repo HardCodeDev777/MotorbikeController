@@ -1,4 +1,10 @@
-﻿# 🏍️ MotorbikeController
+![Unity](https://img.shields.io/badge/Unity-unity?logo=Unity&color=%23000000)
+![C#](https://img.shields.io/badge/C%23-%23512BD4?logo=.NET)
+![License](https://img.shields.io/github/license/HardCodeDev777/MotorbikeController?color=%2305991d)
+![Last commit](https://img.shields.io/github/last-commit/HardCodeDev777/MotorbikeController?color=%2305991d)
+![Top lang](https://img.shields.io/github/languages/top/HardCodeDev777/MotorbikeController)
+ 
+ # 🏍️ MotorbikeController
 
 This is my first physics-based vehicle controller in Unity.  
 It was made just for fun over a couple of days, so expect plenty of bugs (the wheelie system is an absolute 🎥).
