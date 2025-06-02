@@ -234,33 +234,6 @@ namespace HardCodeDev.MotorbikeController
         }
         #endregion
 
-        #region Stiffness
-        //private void StiffnessControl()
-        //{
-        //    if (!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W)) ChangeStiffness(1f, 1f, 1f, 1f);
-
-        //    else ChangeStiffness(_stiffness.backForwardStiffness, _stiffness.backForwardStiffness, _stiffness.frontForwardStiffness, _stiffness.frontSidewaysStiffness);
-        //}
-
-        //private void ChangeStiffness(float backForwValue, float backSideValue, float frontForwValue, float frontSideValue)
-        //{
-        //    var backForw = _wheelsSettings.backCollider.forwardFriction;
-        //    var backSide = _wheelsSettings.backCollider.sidewaysFriction;
-        //    var frontForw = _wheelsSettings.frontCollider.forwardFriction;
-        //    var frontSide = _wheelsSettings.frontCollider.sidewaysFriction;
-
-        //    backForw.stiffness = backForwValue;
-        //    backSide.stiffness = backSideValue;
-        //    frontForw.stiffness = frontForwValue;
-        //    frontSide.stiffness = frontSideValue;
-
-        //    _wheelsSettings.backCollider.forwardFriction = backForw;
-        //    _wheelsSettings.backCollider.sidewaysFriction = backSide;
-        //    _wheelsSettings.frontCollider.forwardFriction = frontForw;
-        //    _wheelsSettings.frontCollider.sidewaysFriction = frontSide;
-        //}
-        #endregion
-
         #region Extra helpful
 
         private void StiffnessControl()
