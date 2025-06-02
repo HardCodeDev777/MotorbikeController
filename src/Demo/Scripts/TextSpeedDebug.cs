@@ -6,8 +6,8 @@ namespace HardCodeDev.Examples
 
     public class TextSpeedDebug : MonoBehaviour
     {
-        [SerializeField] private TMPro.TMP_Text speedText;
+        [SerializeField] private TMPro.TMP_Text _speedText;
 
-        private void Update() => speedText.text = $"{MotorbikeController.Speed}";
+        private void Update() => _speedText.text = $"{MotorbikeController.Speed}";
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using HardCodeDev.Attributes;
 
 namespace HardCodeDev.MotorbikeController
 {
@@ -30,10 +31,8 @@ namespace HardCodeDev.MotorbikeController
         {
             public float wheelieTime;
 
-            [NonSerialized]
-            public float wheelieBreakTime;
-            [NonSerialized]
-            public bool isWheelieng;
+            [NonSerialized] public float wheelieBreakTime;
+            [NonSerialized] public bool isWheelieng;
         }
 
         private readonly struct WheelieConfig
@@ -56,8 +55,23 @@ namespace HardCodeDev.MotorbikeController
         {
             public float stabilizationAngle, stabilizationPower;
 
-            [NonSerialized]
-            public float realStablizationAngle;
+            [NonSerialized] public float realStablizationAngle;
+        }
+
+        [Serializable]
+        public struct AISettings
+        {
+            public bool isBot;
+            public Transform firstTarget;
+            [NotInteractable] public Transform currentTarget;
+
+            [NonSerialized] public float horizontalInput, verticalInput;
+        }
+
+        [Serializable]
+        private struct SpeedAndBrakeSettings
+        {
+            public float maxSpeed, breakPower, horsePower;
         }
 
         [Serializable]
@@ -67,19 +81,12 @@ namespace HardCodeDev.MotorbikeController
             public WheelCollider frontCollider, backCollider;
             public Transform frontWheel, backWheel;
         }
-
-        [Serializable]
-        private struct SpeedAndBrakeSettings
-        {
-            public float maxSpeed, breakPower, horsePower;
-        }
         #endregion
 
         [SerializeField] private WheelsSettings _wheelsSettings = new();
         [SerializeField] private SpeedAndBrakeSettings _speedAndBrakeSettings = new();
         [SerializeField] private StabilizationSettings _stabilization = new();
-        [SerializeField]
-        private WheelieRuntime _wheelieRuntime = new()
+        [SerializeField] private WheelieRuntime _wheelieRuntime = new()
         {
             wheelieBreakTime = 0f,
         };
@@ -87,6 +94,8 @@ namespace HardCodeDev.MotorbikeController
         private WheelieConfig _wheelieConfig;
         private StiffnessSettings _stiffness;
         private Rigidbody _rb;
+
+        public AISettings aiSettings = new();
 
         public static float Speed { get; private set; }
 
@@ -97,7 +106,6 @@ namespace HardCodeDev.MotorbikeController
         {
             _rb = GetComponent<Rigidbody>();
             InitStructures();
-            _stabilization.realStablizationAngle = _stabilization.stabilizationAngle;
         }
 
         private void InitStructures()
@@ -105,6 +113,10 @@ namespace HardCodeDev.MotorbikeController
             _stiffness = new(_wheelsSettings.frontCollider.forwardFriction.stiffness, _wheelsSettings.frontCollider.sidewaysFriction.stiffness, _wheelsSettings.backCollider.forwardFriction.stiffness, _wheelsSettings.backCollider.sidewaysFriction.stiffness);
 
             _wheelieConfig = new(wheelieResetTime: 2f, wheelieDelay: 0.5f, rbOriginalMass: _rb.mass, rbWheelieMass: 100f, motorWheelie: 15f, wheelieCenterOfMass: new(0, 0, -4f));
+
+            _stabilization.realStablizationAngle = _stabilization.stabilizationAngle;
+            aiSettings.currentTarget = aiSettings.firstTarget;
+            aiSettings.verticalInput = 1f;
         }
         #endregion
 
@@ -118,9 +130,7 @@ namespace HardCodeDev.MotorbikeController
             Stabilization();
             StiffnessControl();
 
-            Debug.Log($"Time for wheelie: {_wheelieRuntime.wheelieBreakTime}");
-            Debug.Log($"Back: {_wheelsSettings.backCollider.rpm}");
-            Debug.Log($"Front: {_wheelsSettings.frontCollider.rpm}");
+            if(aiSettings.isBot) BotControl();
         }
 
         private void FixedUpdate()
@@ -132,15 +142,40 @@ namespace HardCodeDev.MotorbikeController
         }
         #endregion
 
+        #region AI
+
+        private void BotControl()
+        {
+            var directionToTarget = (aiSettings.currentTarget.position - transform.position).normalized;
+            var cross = Vector3.Cross(transform.forward, directionToTarget);
+            var distance = Vector3.Distance(transform.position, aiSettings.currentTarget.position);
+            aiSettings.horizontalInput = Mathf.Clamp(cross.y, -1f, 1f);
+        }
+
+        #endregion
+
         #region Basic
         private void MotorInput()
         {
-            var torque = (_speedAndBrakeSettings.horsePower * PhysicsConfig.Watt) / PhysicsConfig.Omega;
-            if (_wheelieRuntime.isWheelieng) _wheelsSettings.backCollider.motorTorque = Input.GetAxis("Vertical") * torque * _wheelieConfig.motorWheelie;
-            else _wheelsSettings.backCollider.motorTorque = Input.GetAxis("Vertical") * torque;
+            if (aiSettings.isBot)
+            {
+                var torque = (_speedAndBrakeSettings.horsePower * PhysicsConfig.Watt) / PhysicsConfig.Omega;
+                if (_wheelieRuntime.isWheelieng) _wheelsSettings.backCollider.motorTorque = aiSettings.verticalInput * torque * _wheelieConfig.motorWheelie;
+                else _wheelsSettings.backCollider.motorTorque = aiSettings.verticalInput * torque;
+            }
+            else
+            {
+                var torque = (_speedAndBrakeSettings.horsePower * PhysicsConfig.Watt) / PhysicsConfig.Omega;
+                if (_wheelieRuntime.isWheelieng) _wheelsSettings.backCollider.motorTorque = Input.GetAxis("Vertical") * torque * _wheelieConfig.motorWheelie;
+                else _wheelsSettings.backCollider.motorTorque = Input.GetAxis("Vertical") * torque;
+            }
         }
 
-        private void RotationInput() => _wheelsSettings.frontCollider.steerAngle = Input.GetAxis("Horizontal") * _wheelsSettings.steerAngle;
+        private void RotationInput() 
+        {
+            if (aiSettings.isBot) _wheelsSettings.frontCollider.steerAngle = aiSettings.horizontalInput * _wheelsSettings.steerAngle;
+            else _wheelsSettings.frontCollider.steerAngle = Input.GetAxis("Horizontal") * _wheelsSettings.steerAngle;
+        }
 
         private void UpdateWheel(Transform wheel, in WheelCollider wheelCollider)
         {
@@ -166,7 +201,7 @@ namespace HardCodeDev.MotorbikeController
         #region Wheelie
         private void WheelieControl()
         {
-            if (Input.GetKey(KeyCode.Space) && Input.GetKey(KeyCode.W)) _wheelieRuntime.wheelieBreakTime += 0.1f;
+            if (Input.GetKey(KeyCode.Space) && Input.GetKey(KeyCode.W)) _wheelieRuntime.wheelieBreakTime += 0.1f * Time.deltaTime;
             else StartCoroutine(nameof(WaitToResetWheelieBreakTime));
 
             if (Input.GetKeyUp(KeyCode.Space))
@@ -199,7 +234,35 @@ namespace HardCodeDev.MotorbikeController
         }
         #endregion
 
+        #region Stiffness
+        //private void StiffnessControl()
+        //{
+        //    if (!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W)) ChangeStiffness(1f, 1f, 1f, 1f);
+
+        //    else ChangeStiffness(_stiffness.backForwardStiffness, _stiffness.backForwardStiffness, _stiffness.frontForwardStiffness, _stiffness.frontSidewaysStiffness);
+        //}
+
+        //private void ChangeStiffness(float backForwValue, float backSideValue, float frontForwValue, float frontSideValue)
+        //{
+        //    var backForw = _wheelsSettings.backCollider.forwardFriction;
+        //    var backSide = _wheelsSettings.backCollider.sidewaysFriction;
+        //    var frontForw = _wheelsSettings.frontCollider.forwardFriction;
+        //    var frontSide = _wheelsSettings.frontCollider.sidewaysFriction;
+
+        //    backForw.stiffness = backForwValue;
+        //    backSide.stiffness = backSideValue;
+        //    frontForw.stiffness = frontForwValue;
+        //    frontSide.stiffness = frontSideValue;
+
+        //    _wheelsSettings.backCollider.forwardFriction = backForw;
+        //    _wheelsSettings.backCollider.sidewaysFriction = backSide;
+        //    _wheelsSettings.frontCollider.forwardFriction = frontForw;
+        //    _wheelsSettings.frontCollider.sidewaysFriction = frontSide;
+        //}
+        #endregion
+
         #region Extra helpful
+
         private void StiffnessControl()
         {
             if (!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W))
@@ -238,17 +301,16 @@ namespace HardCodeDev.MotorbikeController
                 _wheelsSettings.frontCollider.sidewaysFriction = frontSide;
             }
         }
-
         private void Stabilization()
         {
             var angle = Vector3.Angle(transform.up, Vector3.up);
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) _stabilization.realStablizationAngle = _stabilization.stabilizationAngle - 1;
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) _stabilization.realStablizationAngle = _stabilization.stabilizationAngle;
             else _stabilization.realStablizationAngle = 0f;
 
             if (angle > _stabilization.realStablizationAngle)
             {
                 var rawDirection = Vector3.Cross(transform.up, Vector3.up);
-                var stabilizationPower = Mathf.Clamp01(angle / 15) * _stabilization.stabilizationPower;
+                var stabilizationPower = Mathf.Clamp01(angle) * _stabilization.stabilizationPower;
                 _rb.AddTorque(rawDirection * stabilizationPower);
             }
         }

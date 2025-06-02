@@ -8,6 +8,7 @@ It was made just for fun over a couple of days, so expect plenty of bugs (the wh
 - Torque, brake torque, friction, and stiffness management.
 - Bike stabilization via `AddTorque` when tilted.
 - Fully modular architecture using `readonly struct`, `Serializable class`, `MonoBehaviour`, and config wrappers.
+- AI system with checkpoints and following any GameObject.
 - Could serve as a base for any Unity motorbike controller.
 
 > [!IMPORTANT]
